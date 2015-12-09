@@ -1,57 +1,3 @@
-# GPML - liKFunctions - prediction mode
-# With three or four input arguments:                       [PREDICTION MODE]
-#
-#    lp = lik(hyp, y, mu) OR [lp, ymu, ys2] = lik(hyp, y, mu, s2)
-#
-# This allows to evaluate the predictive distribution. Let p(y_*|f_*) be the
-# likelihood of a test point and N(f_*|mu,s2) an approximation to the posterior
-# marginal p(f_*|x_*,x,y) as returned by an inference method. The predictive
-# distribution p(y_*|x_*,x,y) is approximated by.
-#   q(y_*) = \int N(f_*|mu,s2) p(y_*|f_*) df_*
-#
-#   lp = log( q(y) ) for a particular value of y, if s2 is [] or 0, this
-#                    corresponds to log( p(y|mu) )
-#   ymu and ys2      the mean and variance of the predictive marginal q(y)
-#                    note that these two numbers do not depend on a particular 
-#                    value of y 
-#  All vectors have the same size.
-#
-
-# GPML - liKFunctions - inference mode
-# With five or six input arguments, the fifth being a string [INFERENCE MODE]
-#
-# [varargout] = lik(hyp, y, mu, s2, inf) OR
-# [varargout] = lik(hyp, y, mu, s2, inf, i)
-#
-# There are three cases for inf, namely a) infLaplace, b) infEP and c) infVB. 
-# The last input i, refers to derivatives w.r.t. the ith hyperparameter. 
-#
-# a1) [lp,dlp,d2lp,d3lp] = lik(hyp, y, f, [], 'infLaplace')
-# lp, dlp, d2lp and d3lp correspond to derivatives of the log likelihood 
-# log(p(y|f)) w.r.t. to the latent location f.
-#   lp = log( p(y|f) )
-#  dlp = d   log( p(y|f) ) / df
-# d2lp = d^2 log( p(y|f) ) / df^2
-# d3lp = d^3 log( p(y|f) ) / df^3
-#
-# a2) [lp_dhyp,dlp_dhyp,d2lp_dhyp] = lik(hyp, y, f, [], 'infLaplace', i)
-# returns derivatives w.r.t. to the ith hyperparameter
-#   lp_dhyp = d   log( p(y|f) ) / (     dhyp_i)
-#  dlp_dhyp = d^2 log( p(y|f) ) / (df   dhyp_i)
-# d2lp_dhyp = d^3 log( p(y|f) ) / (df^2 dhyp_i)
-#
-#
-# b1) [lZ,dlZ,d2lZ] = lik(hyp, y, mu, s2, 'infEP')
-# let Z = \int p(y|f) N(f|mu,s2) df then
-#   lZ =     log(Z)
-#  dlZ = d   log(Z) / dmu
-# d2lZ = d^2 log(Z) / dmu^2
-#
-# b2) [dlZhyp] = lik(hyp, y, mu, s2, 'infEP', i)
-# returns derivatives w.r.t. to the ith hyperparameter
-# dlZhyp = d log(Z) / dhyp_i
-#
-
 
 function doLik(likfn::LikGauss,y,mu)
     sn2 = exp(2.0*likfn.hyp[1])
@@ -92,7 +38,7 @@ function doLik(likfn::LikGauss,y,mu,s2,inffn; wrt=0)
 #    elseif typeof(inffn) == InfLaplace
 #        if wrt == 0    # no derivative mode
 #            ymmu = y-mu
-#            lp = -ymmu.^2.0/(2.0*sn2) - log(2.0*pi*sn2)/2.0 
+#            lp = -ymmu.^2.0/(2.0*sn2) - log(2.0*pi*sn2)/2.0
 #            dlp = ymmu/sn2      # dlp, derivative of log likelihood
 #            d2lp = -fill!(similar(ymmu),1.0)/sn2
 #            d3lp = fill!(similar(ymmu),0.0)
@@ -107,4 +53,3 @@ function doLik(likfn::LikGauss,y,mu,s2,inffn; wrt=0)
         error("No LikGauss support for inference: "*string(inf))
     end
 end
-
