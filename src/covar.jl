@@ -10,6 +10,7 @@ function sq_dist(a,b)
 end
 sq_dist(a)=sq_dist(a,a)
 
+# Adding comment
 
 function doCov(gp::GPmodel,a,b; wrt=0)
     doCov(gp.covfn,a,b,wrt=wrt)
